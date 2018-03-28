@@ -25,3 +25,4 @@ package-lock.json
 /dist
 /data
 /test/data
+/assets/react-svg

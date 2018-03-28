@@ -22,7 +22,8 @@
     "prettier": "prettier --write --single-quote --trailing-comma es5 \"src/**/*.js\" public/electron.js",
     "postinstall": "electron-builder install-app-deps",
     "storybook": "start-storybook -p 9009 -s public",
-    "build-storybook": "build-storybook -s public"
+    "build-storybook": "build-storybook -s public",
+    "build-svg": "svgr --icon --single-quote --replace-attr-value \"#FFF=currentColor\" -d assets/react-svg assets/icon"
   },
   "dependencies": {
     "electron-is-dev": "^0.3.0",
@@ -63,6 +64,7 @@
     "prettier": "^1.11.1",
     "prop-types": "^15.6.0",
     "sinon": "^4.1.6",
+    "svgr": "^1.9.1",
     "unexpected": "^10.37.2",
     "unexpected-sinon": "^10.8.2",
     "wait-on": "^2.1.0"
