@@ -8,6 +8,7 @@ import { Header, Title } from '../component/header';
 import { Button, BackButton, RadioButton } from '../component/button';
 import { SettingItem } from '../component/list';
 import { color } from '../component/style';
+import { FIATS } from '../config';
 
 //
 // Setting Fiat View
@@ -26,6 +27,8 @@ const styles = StyleSheet.create({
   },
 });
 
+const fiatEntries = Object.entries(FIATS);
+
 const SettingFiatView = ({ store, nav, setting }) => {
   return (
     <Background color={color.blackDark} style={styles.wrapper}>
@@ -36,24 +39,15 @@ const SettingFiatView = ({ store, nav, setting }) => {
       </Header>
       <MainContent style={styles.content}>
         <View style={styles.list}>
-          <SettingItem
-            name={store.usdFiatLabel}
-            onSelect={() => setting.setFiatCurrency({ fiat: 'usd' })}
-          >
-            <RadioButton selected={'usd' === store.settings.fiat} />
-          </SettingItem>
-          <SettingItem
-            name={store.eurFiatLabel}
-            onSelect={() => setting.setFiatCurrency({ fiat: 'eur' })}
-          >
-            <RadioButton selected={'eur' === store.settings.fiat} />
-          </SettingItem>
-          <SettingItem
-            name={store.gbpFiatLabel}
-            onSelect={() => setting.setFiatCurrency({ fiat: 'gbp' })}
-          >
-            <RadioButton selected={'gbp' === store.settings.fiat} />
-          </SettingItem>
+          {fiatEntries.map(([fiatKey, { displayLong }]) => (
+            <SettingItem
+              name={displayLong}
+              onSelect={() => setting.setFiatCurrency({ fiat: fiatKey })}
+              key={fiatKey}
+            >
+              <RadioButton selected={fiatKey === store.settings.fiat} />
+            </SettingItem>
+          ))}
         </View>
       </MainContent>
     </Background>
