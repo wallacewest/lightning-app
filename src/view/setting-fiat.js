@@ -1,12 +1,12 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Picker, StyleSheet, View } from 'react-native';
 import { observer } from 'mobx-react';
 import PropTypes from 'prop-types';
 import Background from '../component/background';
 import MainContent from '../component/main-content';
 import { Header, Title } from '../component/header';
-import { Button, BackButton, RadioButton } from '../component/button';
-import { SettingItem } from '../component/list';
+import { Button, BackButton } from '../component/button';
+import { SettingPicker } from '../component/list';
 import { color } from '../component/style';
 import { FIATS } from '../config';
 
@@ -39,15 +39,16 @@ const SettingFiatView = ({ store, nav, setting }) => {
       </Header>
       <MainContent style={styles.content}>
         <View style={styles.list}>
-          {fiatEntries.map(([fiatKey, { displayLong }]) => (
-            <SettingItem
-              name={displayLong}
-              onSelect={() => setting.setFiatCurrency({ fiat: fiatKey })}
-              key={fiatKey}
-            >
-              <RadioButton selected={fiatKey === store.settings.fiat} />
-            </SettingItem>
-          ))}
+          <SettingPicker
+            selectedValue={store.settings.fiat}
+            onValueChange={itemValue => {
+              setting.setFiatCurrency({ fiat: itemValue });
+            }}
+          >
+            {fiatEntries.map(([fiatKey, { displayLong }]) => (
+              <Picker.Item label={displayLong} value={fiatKey} key={fiatKey} />
+            ))}
+          </SettingPicker>
         </View>
       </MainContent>
     </Background>
