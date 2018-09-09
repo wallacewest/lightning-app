@@ -46,7 +46,12 @@ const SettingFiatView = ({ store, nav, setting }) => {
             }}
           >
             {fiatEntries.map(([fiatKey, { displayLong }]) => (
-              <Picker.Item label={displayLong} value={fiatKey} key={fiatKey} />
+              <Picker.Item
+                label={displayLong}
+                value={fiatKey}
+                color={color.black}
+                key={fiatKey}
+              />
             ))}
           </SettingPicker>
         </View>
