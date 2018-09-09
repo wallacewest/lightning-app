@@ -26,7 +26,6 @@ export const AmountInputField = ({ style, ...props }) => (
     defaultFontSize={font.sizeXXXL}
     keyboardType="numeric"
     placeholder="0"
-    placeholderTextColor={color.blackText}
     {...props}
   />
 );
