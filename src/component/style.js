@@ -51,3 +51,10 @@ export const font = {
   lineHeightXXL: 60,
   lineHeightXXXL: 100,
 };
+
+export const fontFamily = {
+  WorkSansExtraLight: {
+    name: 'WorkSans ExtraLight',
+    widthHeightRatio: 0.6,
+  },
+};

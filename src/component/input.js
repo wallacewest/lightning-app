@@ -75,4 +75,89 @@ HorizontalExpandingTextInput.propTypes = {
   style: RNText.propTypes.style,
 };
 
+//
+// Adjusting Text Input
+//
+
+export class AdjustingTextInput extends Component {
+  constructor(props) {
+    super(props);
+    const { defaultFontSize, fontWidthHeightRatio } = props;
+
+    this.state = {
+      text: '',
+      width: defaultFontSize * fontWidthHeightRatio,
+      fontSize: defaultFontSize,
+    };
+  }
+
+  render() {
+    const {
+      value,
+      style,
+      fontWidthHeightRatio,
+      defaultFontSize,
+      maxWidth,
+      onChangeText,
+      ...props
+    } = this.props;
+    const { text, width, fontSize } = this.state;
+    const calculatedStyle = [
+      style,
+      {
+        width,
+        fontSize,
+      },
+    ];
+
+    const calculateWidthAndFontSize = text => {
+      const predictedTextLength = text.length ? text.length : 1;
+      const calculatedWidth = Math.min(
+        maxWidth,
+        predictedTextLength * defaultFontSize * fontWidthHeightRatio
+      );
+      const calculatedFontSize =
+        calculatedWidth >= maxWidth
+          ? Math.min(
+              defaultFontSize,
+              calculatedWidth / predictedTextLength / fontWidthHeightRatio
+            )
+          : defaultFontSize;
+
+      return { calculatedWidth, calculatedFontSize };
+    };
+
+    const onChangeTextHandler = changedText => {
+      const { calculatedWidth, calculatedFontSize } = calculateWidthAndFontSize(
+        changedText
+      );
+
+      this.setState({
+        text: changedText,
+        width: calculatedWidth,
+        fontSize: calculatedFontSize,
+      });
+      onChangeText && onChangeText(changedText);
+    };
+
+    return (
+      <TextInput
+        value={value || text}
+        onChangeText={changedText => onChangeTextHandler(changedText)}
+        style={calculatedStyle}
+        {...props}
+      />
+    );
+  }
+}
+
+AdjustingTextInput.propTypes = {
+  value: PropTypes.string,
+  fontWidthHeightRatio: PropTypes.number.isRequired,
+  defaultFontSize: PropTypes.number.isRequired,
+  maxWidth: PropTypes.number.isRequired,
+  onChangeText: PropTypes.func,
+  style: RNText.propTypes.style,
+};
+
 export default TextInput;
