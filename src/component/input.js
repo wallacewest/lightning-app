@@ -79,6 +79,28 @@ HorizontalExpandingTextInput.propTypes = {
 // Adjusting Text Input
 //
 
+const calculateWidthAndFontSize = (
+  text,
+  maxWidth,
+  defaultFontSize,
+  fontWidthHeightRatio
+) => {
+  const predictedTextLength = text.length || 1;
+  const calculatedWidth = Math.min(
+    maxWidth,
+    predictedTextLength * defaultFontSize * fontWidthHeightRatio
+  );
+  const calculatedFontSize =
+    calculatedWidth >= maxWidth
+      ? Math.min(
+          defaultFontSize,
+          calculatedWidth / predictedTextLength / fontWidthHeightRatio
+        )
+      : defaultFontSize;
+
+  return { calculatedWidth, calculatedFontSize };
+};
+
 export class AdjustingTextInput extends Component {
   constructor(props) {
     super(props);
@@ -89,6 +111,32 @@ export class AdjustingTextInput extends Component {
       width: defaultFontSize * fontWidthHeightRatio,
       fontSize: defaultFontSize,
     };
+
+    this.onChangeTextHandler = this.onChangeTextHandler.bind(this);
+  }
+
+  onChangeTextHandler(
+    changedText,
+    maxWidth,
+    defaultFontSize,
+    fontWidthHeightRatio,
+    onChangeText
+  ) {
+    const { calculatedWidth, calculatedFontSize } = calculateWidthAndFontSize(
+      changedText,
+      maxWidth,
+      defaultFontSize,
+      fontWidthHeightRatio
+    );
+
+    if (changedText.match(/^(?:[1-9]\d*|0)?(?:\.\d*)?$/)) {
+      this.setState({
+        text: changedText,
+        width: calculatedWidth,
+        fontSize: calculatedFontSize,
+      });
+      onChangeText && onChangeText(changedText);
+    }
   }
 
   render() {
@@ -110,40 +158,18 @@ export class AdjustingTextInput extends Component {
       },
     ];
 
-    const calculateWidthAndFontSize = text => {
-      const predictedTextLength = text.length ? text.length : 1;
-      const calculatedWidth = Math.min(
-        maxWidth,
-        predictedTextLength * defaultFontSize * fontWidthHeightRatio
-      );
-      const calculatedFontSize =
-        calculatedWidth >= maxWidth
-          ? Math.min(
-              defaultFontSize,
-              calculatedWidth / predictedTextLength / fontWidthHeightRatio
-            )
-          : defaultFontSize;
-
-      return { calculatedWidth, calculatedFontSize };
-    };
-
-    const onChangeTextHandler = changedText => {
-      const { calculatedWidth, calculatedFontSize } = calculateWidthAndFontSize(
-        changedText
-      );
-
-      this.setState({
-        text: changedText,
-        width: calculatedWidth,
-        fontSize: calculatedFontSize,
-      });
-      onChangeText && onChangeText(changedText);
-    };
-
     return (
       <TextInput
         value={value || text}
-        onChangeText={changedText => onChangeTextHandler(changedText)}
+        onChangeText={changedText =>
+          this.onChangeTextHandler(
+            changedText,
+            maxWidth,
+            defaultFontSize,
+            fontWidthHeightRatio,
+            onChangeText
+          )
+        }
         style={calculatedStyle}
         {...props}
       />

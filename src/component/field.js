@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text as RNText, StyleSheet, View } from 'react-native';
+import { Text as RNText, StyleSheet, View, Platform } from 'react-native';
 import PropTypes from 'prop-types';
 import Text from './text';
 import { TextInput, AdjustingTextInput } from './input';
@@ -19,16 +19,19 @@ const amountStyles = StyleSheet.create({
   },
 });
 
-export const AmountInputField = ({ style, ...props }) => (
-  <AdjustingTextInput
-    style={[amountStyles.input, style]}
-    fontWidthHeightRatio={amountFont.widthHeightRatio}
-    defaultFontSize={font.sizeXXXL}
-    keyboardType="numeric"
-    placeholder="0"
-    {...props}
-  />
-);
+export const AmountInputField = ({ style, ...props }) => {
+  const nonWebProps = Platform.OS === 'web' ? {} : { keyboardType: 'numeric' };
+  return (
+    <AdjustingTextInput
+      style={[amountStyles.input, style]}
+      fontWidthHeightRatio={amountFont.widthHeightRatio}
+      defaultFontSize={font.sizeXXXL}
+      placeholder="0"
+      {...nonWebProps}
+      {...props}
+    />
+  );
+};
 
 AmountInputField.propTypes = {
   style: RNText.propTypes.style,
