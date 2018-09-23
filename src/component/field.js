@@ -26,7 +26,6 @@ export const AmountInputField = ({ style, ...props }) => {
       style={[amountStyles.input, style]}
       fontWidthHeightRatio={amountFont.widthHeightRatio}
       defaultFontSize={font.sizeXXXL}
-      placeholder="0"
       {...nonWebProps}
       {...props}
     />

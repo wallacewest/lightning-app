@@ -175,6 +175,11 @@ AdjustingTextInput.propTypes = {
   maxWidth: PropTypes.number.isRequired,
   onChangeText: PropTypes.func,
   style: RNText.propTypes.style,
+  placeholder: PropTypes.string,
+};
+
+AdjustingTextInput.defaultProps = {
+  placeholder: '0',
 };
 
 export default TextInput;
