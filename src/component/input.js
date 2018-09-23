@@ -36,65 +36,49 @@ TextInput.propTypes = {
 };
 
 //
-// Horizontal Expanding Text Input
-//
-
-export class HorizontalExpandingTextInput extends Component {
-  constructor(props) {
-    super(props);
-    this.state = { text: '', width: 0 };
-  }
-  render() {
-    const { value, charWidth, onChangeText, style, ...props } = this.props;
-    return (
-      <TextInput
-        value={value || this.state.text}
-        onChangeText={text => {
-          this.setState({ text, width: charWidth * (text.length + 1) });
-          onChangeText && onChangeText(text);
-        }}
-        style={[
-          style,
-          {
-            width: Math.max(
-              charWidth * 2,
-              value ? charWidth * (value.length + 1) : this.state.width
-            ),
-          },
-        ]}
-        {...props}
-      />
-    );
-  }
-}
-
-HorizontalExpandingTextInput.propTypes = {
-  value: PropTypes.string,
-  charWidth: PropTypes.number.isRequired,
-  onChangeText: PropTypes.func,
-  style: RNText.propTypes.style,
-};
-
-//
 // Adjusting Text Input
 //
+
+const getCharWidthHeightRatio = (fontWidthHeightRatio, char) =>
+  fontWidthHeightRatio[char] || fontWidthHeightRatio['default'];
 
 const calculateWidthAndFontSize = (
   text,
   maxWidth,
   defaultFontSize,
-  fontWidthHeightRatio
+  fontWidthHeightRatio,
+  placeholderFirstChar
 ) => {
   const predictedTextLength = text.length || 1;
+  const predictedTextCharArray = text.split('') || [placeholderFirstChar];
+  const predictedTextWidth = predictedTextCharArray.reduce(
+    (accumulator, currentValue) =>
+      getCharWidthHeightRatio(fontWidthHeightRatio, currentValue) *
+        defaultFontSize +
+      accumulator,
+    0
+  );
   const calculatedWidth = Math.min(
     maxWidth,
-    predictedTextLength * defaultFontSize * fontWidthHeightRatio
+    Math.max(
+      predictedTextWidth,
+      getCharWidthHeightRatio(fontWidthHeightRatio, placeholderFirstChar) *
+        defaultFontSize
+    )
   );
+
+  const averageFontWidthHeightRatio =
+    predictedTextCharArray.reduce(
+      (accumulator, currentValue) =>
+        getCharWidthHeightRatio(fontWidthHeightRatio, currentValue) +
+        accumulator,
+      0
+    ) / predictedTextLength;
   const calculatedFontSize =
     calculatedWidth >= maxWidth
       ? Math.min(
           defaultFontSize,
-          calculatedWidth / predictedTextLength / fontWidthHeightRatio
+          calculatedWidth / predictedTextLength / averageFontWidthHeightRatio
         )
       : defaultFontSize;
 
@@ -104,12 +88,16 @@ const calculateWidthAndFontSize = (
 export class AdjustingTextInput extends Component {
   constructor(props) {
     super(props);
-    const { defaultFontSize, fontWidthHeightRatio } = props;
+    const { defaultFontSize, fontWidthHeightRatio, placeholder } = props;
+    const placeholderFirstChar = placeholder.length
+      ? placeholder.charAt(0)
+      : '0';
 
     this.state = {
       text: '',
-      width: defaultFontSize * fontWidthHeightRatio,
+      width: defaultFontSize * fontWidthHeightRatio[placeholderFirstChar],
       fontSize: defaultFontSize,
+      placeholderFirstChar,
     };
 
     this.onChangeTextHandler = this.onChangeTextHandler.bind(this);
@@ -120,13 +108,15 @@ export class AdjustingTextInput extends Component {
     maxWidth,
     defaultFontSize,
     fontWidthHeightRatio,
-    onChangeText
+    onChangeText,
+    placeholderFirstChar
   ) {
     const { calculatedWidth, calculatedFontSize } = calculateWidthAndFontSize(
       changedText,
       maxWidth,
       defaultFontSize,
-      fontWidthHeightRatio
+      fontWidthHeightRatio,
+      placeholderFirstChar
     );
 
     if (changedText.match(/^(?:[1-9]\d*|0)?(?:\.\d*)?$/)) {
@@ -149,7 +139,7 @@ export class AdjustingTextInput extends Component {
       onChangeText,
       ...props
     } = this.props;
-    const { text, width, fontSize } = this.state;
+    const { text, width, fontSize, placeholderFirstChar } = this.state;
     const calculatedStyle = [
       style,
       {
@@ -167,7 +157,8 @@ export class AdjustingTextInput extends Component {
             maxWidth,
             defaultFontSize,
             fontWidthHeightRatio,
-            onChangeText
+            onChangeText,
+            placeholderFirstChar
           )
         }
         style={calculatedStyle}
@@ -179,7 +170,7 @@ export class AdjustingTextInput extends Component {
 
 AdjustingTextInput.propTypes = {
   value: PropTypes.string,
-  fontWidthHeightRatio: PropTypes.number.isRequired,
+  fontWidthHeightRatio: PropTypes.object.isRequired,
   defaultFontSize: PropTypes.number.isRequired,
   maxWidth: PropTypes.number.isRequired,
   onChangeText: PropTypes.func,
